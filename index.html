@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam Countdown</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: white;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.4);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+
+        input, button {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 10px;
+            border: none;
+            width: 100%;
+        }
+
+        button {
+            background: #ff9800;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .time-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .time {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            width: 23%;
+        }
+
+        .number { font-size: 16px; font-weight: bold; }
+        .label { font-size: 11px; }
+
+        .today {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .quote {
+            margin-top: 15px;
+            font-size: 14px;
+            font-style: italic;
+            min-height: 50px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>📚 Exam Countdown</h2>
+
+    <input type="datetime-local" id="examDate">
+    <button onclick="saveDate()">Save Date</button>
+
+    <div class="today" id="todayInfo"></div>
+
+    <div class="time-box">
+        <div class="time">
+            <div class="number" id="days">0</div>
+            <div class="label">দিন</div>
+        </div>
+        <div class="time">
+            <div class="number" id="hours">0</div>
+            <div class="label">ঘণ্টা</div>
+        </div>
+        <div class="time">
+            <div class="number" id="minutes">0</div>
+            <div class="label">মিনিট</div>
+        </div>
+        <div class="time">
+            <div class="number" id="seconds">0</div>
+            <div class="label">সেকেন্ড</div>
+        </div>
+    </div>
+
+    <div class="quote" id="quote"></div>
+</div>
+
+<script>
+let examDate;
+
+const motivationalQuotes = [
+"📖 জ্ঞান অর্জন করা প্রত্যেক মুসলিমের উপর ফরজ।",
+"🌙 নিশ্চয়ই আল্লাহ ধৈর্যশীলদের সাথে আছেন।",
+"📚 আজকের পরিশ্রমই আগামী দিনের সফলতা।",
+"🤲 আল্লাহর উপর ভরসা রাখো, চেষ্টা চালিয়ে যাও।",
+"💪 কঠোর পরিশ্রম কখনও বিফলে যায় না।",
+"🕌 নামাজ পড়ো, মন পরিষ্কার হবে।",
+"🎯 লক্ষ্য ঠিক রাখলে সফলতা আসবেই।",
+"📘 প্রতিদিন একটু একটু পড়লে বড় সফলতা আসে।",
+"🌟 আল্লাহ তোমার পরিশ্রম দেখছেন।",
+"🔥 হাল ছেড়ো না, সফলতা কাছেই।"
+];
+
+function saveDate() {
+    let selectedDate = document.getElementById("examDate").value;
+    if (selectedDate) {
+        localStorage.setItem("examDate", selectedDate);
+        examDate = new Date(selectedDate).getTime();
+        alert("তারিখ সেভ হয়েছে!");
+    }
+}
+
+function loadDate() {
+    let savedDate = localStorage.getItem("examDate");
+    if (savedDate) {
+        document.getElementById("examDate").value = savedDate;
+        examDate = new Date(savedDate).getTime();
+    }
+}
+
+function updateDateTime() {
+    let now = new Date();
+
+    let daysName = ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+    let todayName = daysName[now.getDay()];
+
+    let date = now.toLocaleDateString('bn-BD');
+    let time = now.toLocaleTimeString('bn-BD');
+
+    document.getElementById("todayInfo").innerHTML =
+        "📅 আজ " + todayName + "<br>" + date + " | ⏰ " + time;
+}
+
+function updateCountdown() {
+    if (!examDate) return;
+
+    let now = new Date().getTime();
+    let distance = examDate - now;
+
+    if (distance < 0) {
+        document.querySelector(".card").innerHTML = "<h2>🎉 পরীক্ষা শুরু হয়েছে!</h2>";
+        return;
+    }
+
+    let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerText = days;
+    document.getElementById("hours").innerText = hours;
+    document.getElementById("minutes").innerText = minutes;
+    document.getElementById("seconds").innerText = seconds;
+}
+
+function changeQuote() {
+    let random = Math.floor(Math.random() * motivationalQuotes.length);
+    document.getElementById("quote").innerText = motivationalQuotes[random];
+}
+
+setInterval(updateDateTime, 1000);
+setInterval(updateCountdown, 1000);
+setInterval(changeQuote, 60000); // প্রতি ১ মিনিটে পরিবর্তন
+
+loadDate();
+changeQuote();
+</script>
+
+</body>
+</html>
