@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Exam Countdown</title>
+    <title>Exam Countdown Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -18,10 +18,10 @@
 
         .card {
             background: rgba(0,0,0,0.4);
-            padding: 30px;
+            padding: 25px;
             border-radius: 20px;
             text-align: center;
-            width: 350px;
+            width: 360px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.5);
         }
 
@@ -38,6 +38,10 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
         }
 
         .time-box {
@@ -68,16 +72,28 @@
             min-height: 50px;
         }
 
+        hr {
+            border: 1px solid rgba(255,255,255,0.2);
+            margin: 15px 0;
+        }
+
     </style>
 </head>
 
 <body>
 
 <div class="card">
-    <h2>📚 Exam Countdown</h2>
+    <h2>📚 Exam Countdown Pro</h2>
 
+    <!-- Manual Date Set -->
     <input type="datetime-local" id="examDate">
     <button onclick="saveDate()">Save Date</button>
+
+    <hr>
+
+    <!-- Auto Future Date -->
+    <input type="number" id="daysAfter" placeholder="কত দিন পরে পরীক্ষা?">
+    <button onclick="setFutureDate()">Auto Set Date</button>
 
     <div class="today" id="todayInfo"></div>
 
@@ -104,6 +120,7 @@
 </div>
 
 <script>
+
 let examDate;
 
 const motivationalQuotes = [
@@ -126,6 +143,30 @@ function saveDate() {
         examDate = new Date(selectedDate).getTime();
         alert("তারিখ সেভ হয়েছে!");
     }
+}
+
+function setFutureDate() {
+    let days = document.getElementById("daysAfter").value;
+
+    if (!days || days <= 0) {
+        alert("সঠিক দিন লিখো!");
+        return;
+    }
+
+    let now = new Date();
+    now.setDate(now.getDate() + parseInt(days));
+
+    // নির্দিষ্ট সময় সকাল ১০টা সেট
+    now.setHours(10, 0, 0);
+
+    let futureDate = now.toISOString().slice(0,16);
+
+    document.getElementById("examDate").value = futureDate;
+
+    localStorage.setItem("examDate", futureDate);
+    examDate = new Date(futureDate).getTime();
+
+    alert(days + " দিন পরে পরীক্ষা সেট হয়েছে!");
 }
 
 function loadDate() {
@@ -178,10 +219,11 @@ function changeQuote() {
 
 setInterval(updateDateTime, 1000);
 setInterval(updateCountdown, 1000);
-setInterval(changeQuote, 60000); // প্রতি ১ মিনিটে পরিবর্তন
+setInterval(changeQuote, 60000);
 
 loadDate();
 changeQuote();
+
 </script>
 
 </body>
